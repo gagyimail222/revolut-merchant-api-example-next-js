@@ -30,29 +30,18 @@ function CheckoutPage({ order }) {
 
     const data = new FormData(event.target);
     const RC = await RevolutCheckout(order.token, 'sandbox');
-
-    RC.payWithPopup({
-      name: data.get("name"),
-      email: data.get("email"),
-      phone: data.get("phone"),
-      billingAddress: {
-        countryCode: data.get("countryCode"),
-        region: data.get("region"),
-        city: data.get("city"),
-        streetLine1: data.get("streetLine1"),
-        streetLine2: data.get("streetLine2"),
-        postcode: data.get("postcode")
-      },
-      onSuccess() {
-        finishOrder(order.id);
-      },
-      onError() {
-        renewOrder(order.id);
-      },
-      onCancel() {
-        renewOrder(order.id);
-      }
-    });
+    
+    RC.revolutPay({
+    target: document.getElementById('revolut-pay'),
+    phone: '+441632960022', // recommended
+    onSuccess() {
+      console.log('Payment completed')
+    },
+    onError(error) {
+      console.error('Payment failed: ' + error.message)
+    }
+  });
+   
   }
 
   if (order === null) {
@@ -72,6 +61,7 @@ function CheckoutPage({ order }) {
 
   return (
     <>
+	  <div id='revolut-pay'></div>
       <h2>
         <Link href={`/?order=${order.id}`}>
           <a>Catalogue</a>
